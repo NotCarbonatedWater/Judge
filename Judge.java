@@ -1,45 +1,58 @@
-import java.util.ArrayList;
-
 class Judge {
 
     public static int findJudge(int n, int[][] trust) {
-        ArrayList<Integer> judge = new ArrayList<Integer>(1);
-        ArrayList<Integer> blackList = new ArrayList<Integer>(1);
+        // judgeList: [specific person] [num of people that trust them] //
+        int[][] judgeList = new int[n][2];
 
-        for (int index = 0; index < trust.length; index++) {
-            // automatic blacklist for index 1 for trusting other //
-            blackList.add(trust[index][0]);
-
-            // checks for potential judges that have trusted //
-            for (int k = 0; k < blackList.size(); k++)
-                for (int j = 0; j < judge.size(); j++)
-                    if (judge.get(j) == blackList.get(k)) {
-                        judge.remove(j);
-                        break;
-                    }
-
-            // adds potentiall judge //
-            boolean check = false;
-            for (int j = 0; j < blackList.size(); j++)
-                if (blackList.get(j) == trust[index][1]) {
-                    check = true;
-                    break;
-                }
-            for (int j = 0; j < judge.size(); j++)
-                if (judge.get(j) == trust[index][1]) {
-                    check = true;
-                    break;
-                }
-            if (check == false)
-                judge.add(trust[index][1]);
-        }
-        // return //
-        if (judge.size() == 0)
+        // safety switch for n = 2 //
+        if (n < 2)
             return -1;
-        return judge.get(0);
+        // safety switch for n = 2 //
+        if (n < 3)
+            return trust[0][1];
+
+        // count trusts among town people//
+        for (int i = 0, judgeCounter = 0; i < trust.length; i++, judgeCounter++) {
+
+            // determines whether to add a new person to judgelist //
+            boolean isInArr = false;
+
+            // search for trusts in judgeList //
+            for (int j = 0; j < judgeList.length; j++) {
+
+                // increases num of person taht is trusted //
+                if (trust[i][1] == judgeList[j][0]) {
+                    judgeList[j][1]++;
+                    isInArr = true;
+                }
+
+                // if a person trusts another, then that person loses //
+                // ability to judge by losing a trust, //
+                // thus never reaching n - 1 (becoming a judge) //
+                if (trust[i][0] == judgeList[j][0]) {
+                    judgeList[j][1]--;
+                    isInArr = true;
+                }
+
+                // once a person reaches trust with all people and array //
+                // is at final index, then that person must be a judge //
+                if (judgeList[j][1] == (n - 1) && i >= (trust.length - 1))
+                    return judgeList[j][0];
+            }
+
+            // adds trusted person to judge array //
+            if (!isInArr) {
+                judgeList[judgeCounter][0] = trust[i][1];
+                judgeList[judgeCounter][1] = 1;
+            }
+        }
+
+        // no judge is found //
+        return -1;
     }
 
     public static void main(String[] args) {
+
         // Example 1 //
         int arr[][] = { { 1, 2 } };
         int n = 2;
@@ -61,7 +74,7 @@ class Judge {
         System.out.println("Output Example 4: " + findJudge(n4, arr4) + "\n");
 
         // Example 5 //
-        int arr5[][] = { { 1, 2 }, { 1, 4 }, { 2, 3 }, { 2, 4 }, { 4, 3 } };
+        int arr5[][] = { { 1, 3 }, { 1, 4 }, { 2, 3 }, { 2, 4 }, { 4, 3 } };
         int n5 = 4;
         System.out.println("Output Example 5: " + findJudge(n5, arr5) + "\n");
     }
