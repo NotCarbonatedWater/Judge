@@ -1,10 +1,13 @@
+// JOnathan Jaco //
+// ID: 2051601 //
+
 class Judge {
 
     public static int findJudge(int n, int[][] trust) {
         // judgeList: [specific person] [num of people that trust them] //
         int[][] judgeList = new int[n][2];
 
-        // safety switch for n = 2 //
+        // safety switch for n = 1 //
         if (n < 2)
             return -1;
         // safety switch for n = 2 //
